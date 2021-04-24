@@ -17,6 +17,8 @@ import {
 import {OpacityCrousel,Crousel,DealOfTheDay} from '../../components/index'
 const { height, width } = Dimensions.get('screen');
 
+
+
 const data = [
   'https://cdn.dribbble.com/users/3281732/screenshots/11192830/media/7690704fa8f0566d572a085637dd1eee.jpg?compress=1&resize=1200x1200',
   'https://cdn.dribbble.com/users/3281732/screenshots/13130602/media/592ccac0a949b39f058a297fd1faa38e.jpg?compress=1&resize=1200x1200',
