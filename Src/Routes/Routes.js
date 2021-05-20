@@ -4,7 +4,7 @@ import {createMaterialBottomTabNavigator} from '@react-navigation/material-botto
 import {createStackNavigator} from '@react-navigation/stack';
 import Home from '../Screens/Home/Home'
 import Coupon from '../Screens/Coupon/Coupon';
-import Home3 from '../Screens/Home/Home3';
+import CouponDetails from '../Screens/Coupon/CouponDetails';
 import Splash from '../Screens/Splash/Splash';
 import SignInScreen from '../Screens/SignIn/Signin';
 import Store from '../Screens/Store/Store';
@@ -78,6 +78,7 @@ const HomeStackScreen = ({navigation}) => (
     initialRouteName="Splash">
     <HomeStack.Screen name="Splash" component={Splash} />
     <HomeStack.Screen name="Signin" component={SignInScreen} />
+    <HomeStack.Screen name="CouponDetails" component={CouponDetails} />
     <HomeStack.Screen
       name="Home"
       component={MainTabScreen}
