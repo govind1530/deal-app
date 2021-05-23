@@ -12,10 +12,11 @@ import {
   Easing,
   SafeAreaViewBase,
   SafeAreaView,
+  ActivityIndicator
 } from 'react-native';
 const {width, height} = Dimensions.get('screen');
 import faker from 'faker';
-const pexels = '563492ad6f917000010000011dedb08d617b4c83bfffb77339093c55';
+
 
 faker.seed(10);
 const DATA = [...Array(30).keys()].map((_, i) => {
@@ -35,9 +36,46 @@ const SPACING = 20;
 const AVATAR_SIZE = 70;
 const ITEM_SIZE = AVATAR_SIZE  + SPACING *3;
 const bg = `https://images.pexels.com/photos/2027697/pexels-photo-2027697.jpeg`;
-const AnimatedFlatList = () => {
+
+
+const AnimatedFlatList = ({couponlist}) => {
+  const [loading, setLoading] = React.useState(false);
+  const loadStart = e => {
+    setLoading(true);
+  };
+
+  const loadEnd = e => {
+    setLoading(false);
+  };
+  const FastImages = (uri) => {
+    return (
+      <View style={{margin:10}}>
+        <View style={{justifyContent:'center',alignItems: 'center'}}>
+          <FastImage
+            style={{width: 300, height: 150, borderRadius: 10}}
+            source={{
+              uri: uri ?uri:'',
+              priority: FastImage.priority.normal,
+            }}
+           // resizeMode={FastImage.resizeMode.contain}
+            onLoadStart={e => loadStart(e)}
+            onLoadEnd={e => loadEnd(e)}
+          />
+        </View>
+        {loading && (
+          <ActivityIndicator
+            style={[styles.activityIndicator]}
+            animating={true}
+            size="small"
+            color={'#79FF33 '}
+          />
+        )}
+      </View>
+    );
+  };
   const scrollY = React.useRef(new Animated.Value(0)).current;
   const renderItem = ({ item ,index}) => {
+    console.log('list',item)
     const inputRange = [
       -1,
       0,
@@ -73,10 +111,10 @@ const AnimatedFlatList = () => {
          borderWidth:1
        }}>
          
-         <Image
+         {/* <Image
            source={{uri: item?.image}}
            style={{width: AVATAR_SIZE, height: AVATAR_SIZE,marginRight: SPACING/2,borderRadius:AVATAR_SIZE}}
-         />
+         /> */}
          <View>
            <Text style={{fontSize:22,fontWeight:'700'}}>{item?.name}</Text>
            <Text style={{fontSize:16,opacity:0.7}}>{item?.jobTitle}</Text>
@@ -94,7 +132,7 @@ const AnimatedFlatList = () => {
         blurRadius={10}
       /> */}
       <Animated.FlatList
-        data={DATA}
+        data={couponlist}
         onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }],
         {useNativeDriver:true}
         )}
@@ -107,3 +145,8 @@ const AnimatedFlatList = () => {
 };
 
 export default AnimatedFlatList
+
+{/* <Image
+               source={{uri: item?.image}}
+               style={{width: AVATAR_SIZE, height: AVATAR_SIZE,marginRight: SPACING/2,borderRadius:AVATAR_SIZE}}
+             /> */}

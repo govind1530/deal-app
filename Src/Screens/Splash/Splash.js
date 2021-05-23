@@ -12,18 +12,31 @@ import * as Animatable from 'react-native-animatable';
 import LinearGradient from 'react-native-linear-gradient';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useTheme} from '@react-navigation/native';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const SplashScreen = ({navigation}) => {
   const {colors} = useTheme();
 
-    React.useEffect(() => {
-      setTimeout(() => {
+    React.useEffect(async () => {
+      const values = await AsyncStorage.getItem("user");
+      if(values === 'Login'){
+        setTimeout(() => {
+          navigation.reset({
+            index: 0,
+            routes: [{name: 'Home'}],
+          });
+           // navigation.navigate('Signin');
+        }, 1500); 
+        return true;
+      }else{
+  setTimeout(() => {
        navigation.reset({
          index: 0,
          routes: [{name: 'Signin'}],
        });
         // navigation.navigate('Signin');
-     }, 1500);   
+     }, 1500); 
+      }
+      
     },[])
     
   return (

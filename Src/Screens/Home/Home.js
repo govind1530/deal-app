@@ -12,9 +12,15 @@ import {
   PermissionsAndroid,
   Alert,
   Platform,
-  ScrollView
+  ScrollView,
+  Linking
 } from 'react-native';
-import {OpacityCrousel,Crousel,DealOfTheDay} from '../../components/index'
+import {OpacityCrousel,Crousel,DealOfTheDay} from '../../components/index';
+import Toast from 'react-native-toast-message';
+import Clipboard from '@react-native-clipboard/clipboard';
+import FastImage from 'react-native-fast-image';
+import firestore from '@react-native-firebase/firestore';
+import moment from 'moment';
 const { height, width } = Dimensions.get('screen');
 
 
@@ -64,7 +70,21 @@ const imageW = width * 0.9;
 const imageH = imageW * 0.5;
 
 const HomeScreen = ({navigation}) => {
-    
+  const [loading, setLoading] = React.useState(false);
+  const [couponList,setCouponList] = React.useState()
+  React.useEffect(() => {
+    const subscriber = firestore()
+      .collection('couponlist')
+      .limit(4)
+      .onSnapshot(documentSnapshot => {
+        console.log('couponlist docs: ', documentSnapshot?._docs);
+        setCouponList(documentSnapshot?._docs);
+        //console.log('couponlist changes: ',documentSnapshot?._changes);
+      });
+
+    // Stop listening for updates when no longer required
+    return () => subscriber();
+  }, []);
 
   const categoryButton =(text) =>{
 return(
@@ -73,29 +93,39 @@ return(
   </TouchableOpacity>
 )
   }
-  const couponNavigate = (action) =>{
-if(action  == 'View Details'){
-navigation.navigate('CouponDetails')
-return true;
-}
+   
+  const navigateCouponDetails = (id) =>{
+    console.log('id',id)
+    navigation.navigate('CouponDetails',{couponId:id})
+          }
+
+
+  const openUrl = (url) =>{
+    Linking.canOpenURL(url).then(supported => {
+        if (supported) {
+          Linking.openURL(url);
+        } else {
+          console.log("Don't know how to open URI: " +url);
+        }
+      });
   }
   const renderDeal = ({item}) =>{
     return(
       <View style={styles.FlatListViewContainer}> 
       <Image
-      source={{uri: item?.image}}
+      source={{uri:item?._data?.Image}}
      // resizeMode={'contain'}
       style={{margin:5,width:'95%',height:100,borderRadius:5}}
       />
       <View style={{justifyContent: 'center',alignItems:'center'}}>
-        <Text numberOfLines={2} style={{color:'#CD5C5C',marginHorizontal:3,textAlign:'center'}}>{item?.name}</Text>
-        <Text style={{color:'rgb(228, 0, 43)'}}>Price - {item?.price}</Text>
+        <Text numberOfLines={2} style={{color:'#CD5C5C',marginHorizontal:3,textAlign:'center'}}>{item?._data?.Name}</Text>
+        <Text style={{color:'rgb(228, 0, 43)'}}>Code - {item?._data?.code}</Text>
         </View>
         <TouchableOpacity
         style={{margin:5,borderWidth:1,padding:5,justifyContent: 'center',alignItems:"center",borderColor:"#F08080",backgroundColor:'#DC143C',borderRadius:5}}
-        onPress={()=>couponNavigate(item?.action)}
+        onPress={()=>item?._data?.Url?openUrl(item?._data?.Url):navigateCouponDetails(item?._ref?._documentPath?._parts[1])}
         >
-          <Text style={{color:'#FFA07A'}}>{item?.action}</Text>
+          <Text style={{color:'#FFA07A'}}>{item?._data?.Url?'Buy Now':'View Details'}</Text>
         </TouchableOpacity>
       </View>
     )
@@ -122,7 +152,7 @@ return true;
         </View>
         {/* <OpacityCrousel data={data} /> */}
         <FlatList
-        data={couponData}
+        data={couponList}
         renderItem={renderDeal}
        numColumns={2}
         keyExtractor={(item) => item.key}
